@@ -76,7 +76,7 @@ export function decorateMain(main) {
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
-  const main = doc.querySelector('main');
+  const main = doc.querySelector('.aem-main');
   if (main) {
     decorateMain(main);
     document.body.classList.add('appear');
@@ -98,7 +98,7 @@ async function loadEager(doc) {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
-  const main = doc.querySelector('main');
+  const main = doc.querySelector('.aem-main');
   await loadBlocks(main);
 
   const { hash } = window.location;
