@@ -309,7 +309,7 @@ function createOptimizedPicture(
 ) {
   const url = new URL(src, window.hlx.codeBasePath);
   const picture = document.createElement('picture');
-  const { pathname } = url;
+  const { href } = url;
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
 
   // webp
@@ -317,7 +317,7 @@ function createOptimizedPicture(
     const source = document.createElement('source');
     if (br.media) source.setAttribute('media', br.media);
     source.setAttribute('type', 'image/webp');
-    source.setAttribute('srcset', `${pathname}?width=${br.width}&format=webply&optimize=medium`);
+    source.setAttribute('srcset', `${href}?width=${br.width}&format=webply&optimize=medium`);
     picture.appendChild(source);
   });
 
@@ -326,14 +326,14 @@ function createOptimizedPicture(
     if (i < breakpoints.length - 1) {
       const source = document.createElement('source');
       if (br.media) source.setAttribute('media', br.media);
-      source.setAttribute('srcset', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
+      source.setAttribute('srcset', `${href}?width=${br.width}&format=${ext}&optimize=medium`);
       picture.appendChild(source);
     } else {
       const img = document.createElement('img');
       img.setAttribute('loading', eager ? 'eager' : 'lazy');
       img.setAttribute('alt', alt);
       picture.appendChild(img);
-      img.setAttribute('src', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
+      img.setAttribute('src', `${href}?width=${br.width}&format=${ext}&optimize=medium`);
     }
   });
 
@@ -669,7 +669,7 @@ async function waitForLCP(lcpBlocks) {
   document.body.style.display = null;
   const lcpCandidate = document.querySelector('.aem-main img');
   // Let's make sure this image loads first.
-  lcpCandidate.src = new URL(lcpCandidate.src, window.hlx.codeBasePath);
+  lcpCandidate.src = new URL(lcpCandidate.attributes.src.value, window.hlx.codeBasePath).href;
 
   await new Promise((resolve) => {
     if (lcpCandidate && !lcpCandidate.complete) {
