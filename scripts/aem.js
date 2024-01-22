@@ -309,7 +309,7 @@ function createOptimizedPicture(
 ) {
   const url = new URL(src, window.hlx.codeBasePath);
   const picture = document.createElement('picture');
-  const { href } = url;
+  const { href, pathname } = url;
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
 
   // webp
