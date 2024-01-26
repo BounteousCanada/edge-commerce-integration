@@ -668,8 +668,6 @@ async function waitForLCP(lcpBlocks) {
 
   document.body.style.display = null;
   const lcpCandidate = document.querySelector('.aem-main img,main img');
-  // Let's make sure this image loads first.
-  lcpCandidate.src = new URL(lcpCandidate.attributes.src.value, window.hlx.codeBasePath).href;
 
   await new Promise((resolve) => {
     if (lcpCandidate && !lcpCandidate.complete) {
