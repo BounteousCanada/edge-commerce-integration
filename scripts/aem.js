@@ -609,6 +609,15 @@ async function loadBlocks(main) {
 }
 
 /**
+ * Loads all images with only paths
+ * @param {Element} main
+ * @returns {Promise<void>}
+ */
+async function loadImages(main) {
+  main.querySelectorAll('img').forEach((img) => img.closest('picture').replaceWith(createOptimizedPicture(img.attributes.src.value, img.alt, false, [{ width: '1024' }])));
+}
+
+/**
  * Decorates a block.
  * @param {Element} block The block element
  */
@@ -695,6 +704,7 @@ export {
   getMetadata,
   loadBlock,
   loadBlocks,
+  loadImages,
   loadCSS,
   loadFooter,
   loadHeader,
