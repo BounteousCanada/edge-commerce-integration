@@ -134,18 +134,18 @@ function sampleRUM(checkpoint, data = {}) {
 function setup() {
   window.hlx = window.hlx || {};
   window.hlx.RUM_MASK_URL = 'full';
-  window.hlx.codeBasePath = 'https://main--edge-commerce-integration--bounteouscanada.hlx.page';
+  window.hlx.codeBasePath = '';
   window.hlx.lighthouse = new URLSearchParams(window.location.search).get('lighthouse') === 'on';
 
-  // const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
-  // if (scriptEl) {
-  //   try {
-  //     [window.hlx.codeBasePath] = new URL(scriptEl.src).pathname.split('/scripts/scripts.js');
-  //   } catch (error) {
-  //     // eslint-disable-next-line no-console
-  //     console.log(error);
-  //   }
-  // }
+  const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
+  if (scriptEl) {
+    try {
+      window.hlx.codeBasePath = new URL(scriptEl.src).origin;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
+    }
+  }
 }
 
 /**
@@ -307,7 +307,7 @@ function createOptimizedPicture(
   eager = false,
   breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }],
 ) {
-  const url = new URL(src, window.hlx.codeBasePath);
+  const url = new URL(src, window.hlx.codeBasePath === '' ? window.location.href : window.hlx.codeBasePath);
   const picture = document.createElement('picture');
   const { href, pathname } = url;
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
