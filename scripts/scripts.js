@@ -1,8 +1,6 @@
 import {
   sampleRUM,
   buildBlock,
-  loadHeader,
-  loadFooter,
   decorateButtons,
   decorateIcons,
   decorateSections,
@@ -70,15 +68,30 @@ export function decorateMain(main) {
 }
 
 /**
+ * Usage for Bounteous_EdgeCms
+ * @param doc
+ * @returns {NodeListOf<Element>}
+ */
+function getMain(doc) {
+  let main = doc.querySelectorAll('.aem-main');
+  if (main.length === 0) {
+    main = doc.querySelectorAll('main');
+  }
+  return main;
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
-  const main = doc.querySelector('main');
-  if (main) {
-    decorateMain(main);
+  const main = getMain(doc);
+  if (main.length > 0) {
+    main.forEach((element) => {
+      decorateMain(element);
+    });
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
@@ -98,22 +111,23 @@ async function loadEager(doc) {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
-  const main = doc.querySelector('main');
-  await loadBlocks(main);
+  const mains = getMain(doc);
+  await Promise.all([...mains].map(async (main) => {
+    await loadBlocks(main);
+  }));
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadHeader(doc.querySelector('header'));
-  loadFooter(doc.querySelector('footer'));
-
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
 
-  sampleRUM('lazy');
-  sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
-  sampleRUM.observe(main.querySelectorAll('picture > img'));
+  mains.forEach((mainElement) => {
+    sampleRUM('lazy');
+    sampleRUM.observe(mainElement.querySelectorAll('div[data-block-name]'));
+    sampleRUM.observe(mainElement.querySelectorAll('picture > img'));
+  });
 }
 
 /**
@@ -131,5 +145,7 @@ async function loadPage() {
   await loadLazy(document);
   loadDelayed();
 }
+
+window.loadEds = loadPage; // For re-calling
 
 loadPage();

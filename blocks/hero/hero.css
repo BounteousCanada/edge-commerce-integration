@@ -1,8 +1,8 @@
-main .hero-container > div {
+.aem-main .hero-container > div {
   max-width: unset;
 }
   
-main .hero-container {
+.aem-main .hero-container {
   padding: 0;
 }
 

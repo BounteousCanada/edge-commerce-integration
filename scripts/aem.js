@@ -157,7 +157,7 @@ function setup() {
   const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
   if (scriptEl) {
     try {
-      [window.hlx.codeBasePath] = new URL(scriptEl.src).pathname.split('/scripts/scripts.js');
+      window.hlx.codeBasePath = new URL(scriptEl.src).origin;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log(error);
@@ -324,9 +324,9 @@ function createOptimizedPicture(
   eager = false,
   breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }],
 ) {
-  const url = new URL(src, window.location.href);
+  const url = new URL(src, window.hlx.codeBasePath === '' ? window.location.href : window.hlx.codeBasePath);
   const picture = document.createElement('picture');
-  const { pathname } = url;
+  const { href, pathname } = url;
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
 
   // webp
@@ -334,7 +334,7 @@ function createOptimizedPicture(
     const source = document.createElement('source');
     if (br.media) source.setAttribute('media', br.media);
     source.setAttribute('type', 'image/webp');
-    source.setAttribute('srcset', `${pathname}?width=${br.width}&format=webply&optimize=medium`);
+    source.setAttribute('srcset', `${href}?width=${br.width}&format=webply&optimize=medium`);
     picture.appendChild(source);
   });
 
@@ -343,14 +343,14 @@ function createOptimizedPicture(
     if (i < breakpoints.length - 1) {
       const source = document.createElement('source');
       if (br.media) source.setAttribute('media', br.media);
-      source.setAttribute('srcset', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
+      source.setAttribute('srcset', `${href}?width=${br.width}&format=${ext}&optimize=medium`);
       picture.appendChild(source);
     } else {
       const img = document.createElement('img');
       img.setAttribute('loading', eager ? 'eager' : 'lazy');
       img.setAttribute('alt', alt);
       picture.appendChild(img);
-      img.setAttribute('src', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
+      img.setAttribute('src', `${href}?width=${br.width}&format=${ext}&optimize=medium`);
     }
   });
 
@@ -492,7 +492,7 @@ async function fetchPlaceholders(prefix = 'default') {
   window.placeholders = window.placeholders || {};
   if (!window.placeholders[prefix]) {
     window.placeholders[prefix] = new Promise((resolve) => {
-      fetch(`${prefix === 'default' ? '' : prefix}/placeholders.json`)
+      fetch(`${window.hlx.codeBasePath}${prefix === 'default' ? '' : prefix}/placeholders.json`)
         .then((resp) => {
           if (resp.ok) {
             return resp.json();
@@ -684,7 +684,7 @@ async function waitForLCP(lcpBlocks) {
   if (hasLCPBlock) await loadBlock(block);
 
   document.body.style.display = null;
-  const lcpCandidate = document.querySelector('main img');
+  const lcpCandidate = document.querySelector('.aem-main img') ?? document.querySelector('main img');
 
   await new Promise((resolve) => {
     if (lcpCandidate && !lcpCandidate.complete) {
